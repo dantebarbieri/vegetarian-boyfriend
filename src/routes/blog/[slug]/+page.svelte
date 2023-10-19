@@ -6,7 +6,7 @@
 
 <svelte:head>
 	{#if data.post}
-		<title>The Vegetarian Boyfriend - {data.post.title}</title>
+		<title>{data.post.title} | The Vegetarian Boyfriend</title>
 	{/if}
 </svelte:head>
 
