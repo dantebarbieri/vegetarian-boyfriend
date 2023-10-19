@@ -1,25 +1,25 @@
-<script>
+<script lang="ts">
 	import Card from './Card.svelte';
+	import type { PageData } from './$types';
 
-	import ColoradoHiking from '$lib/assets/colorado-hiking.jpg';
-	import FonduelandBackpack from '$lib/assets/fondueland-backpack.jpg';
+	export let data: PageData;
 </script>
 
+<svelte:head>
+	<title>The Vegetarian Boyfriend</title>
+</svelte:head>
+
 <div class="cards">
-	<Card
-		title="Colorado Hiking"
-		description="Discover the serenity of Colorado's wilderness: Where every step reveals nature's majesty and every view takes your breath away. Join me on a journey through the Rockies!"
-		date={new Date(2023, 7, 16)}
-		link="/colorado-hiking"
-		imageSrcFallback={ColoradoHiking}
-	/>
-	<Card
-		title="Fondue Land (Gstaad) Backpack"
-		description="Discover the serenity of Colorado's wilderness: Where every step reveals nature's majesty and every view takes your breath away. Join me on a journey through the Rockies!"
-		date={new Date(2023, 6, 10)}
-		link="/colorado-hiking"
-		imageSrcFallback={FonduelandBackpack}
-	/>
+	{#each data.posts as post}
+		<Card
+			title={post.title}
+			description={post.description}
+			date={post.date}
+			link={`/blog/${post.slug}`}
+			imageSrcFallback={post.imageSrcFallback}
+			imageSrcWebp={post.imageSrcWebp}
+		/>
+	{/each}
 </div>
 
 <style>
