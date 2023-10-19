@@ -1,7 +1,23 @@
-import ColoradoHiking from '$lib/assets/colorado-hiking.jpg';
-import ColoradoHikingWebp from '$lib/assets/colorado-hiking.webp';
-import FonduelandBackpack from '$lib/assets/fondueland-backpack.jpg';
-import FonduelandBackpackWebp from '$lib/assets/fondueland-backpack.webp';
+// Read .env file and set environment variables
+import 'dotenv/config'
+
+// Use official mongodb driver to connect to the server
+import { MongoClient } from 'mongodb';
+
+// New instance of MongoClient with connection string
+// for Cosmos DB
+const url = process.env.COSMOS_CONNECTION_STRING;
+
+const client = new MongoClient(url as string);
+
+// Use connect method to connect to the server
+await client.connect();
+
+// Database reference with creation if it does not already exist
+const db = client.db(`blogs`);
+
+// Collection reference with creation if it does not already exist
+const collection = db.collection('posts');
 
 interface Post {
     slug: string;
@@ -21,31 +37,10 @@ interface PostSummary {
     imageSrcWebp?: string;
 }
 
-const posts: (Post & PostSummary)[] = [
-    {
-        slug: "colorado-hiking",
-        title: "Colorado Hiking",
-        date: new Date(2023, 7, 16),
-        content: "This is the first post.",
-        description: "Discover the serenity of Colorado's wilderness: Where every step reveals nature's majesty and every view takes your breath away. Join me on a journey through the Rockies!",
-        imageSrcFallback: ColoradoHiking,
-        imageSrcWebp: ColoradoHikingWebp,
-    },
-    {
-        slug: "fondueland-backpack",
-        title: "Fondue Land (Gstaad) Backpack",
-        date: new Date(2023, 6, 10),
-        content: "This is the second post.",
-        description: "Fondue, mountains, and hiking – a trio that defines Swiss leisure. Dive into the heart of Gstaad's Fondue Hike and discover what makes it tick.",
-        imageSrcFallback: FonduelandBackpack,
-        imageSrcWebp: FonduelandBackpackWebp,
-    },
-];
-
-export async function getPost(slug: string): Promise<Post | undefined> {
-    return posts.find((post) => post.slug === slug) as Post;
+export async function getPost(slug: string): Promise<Post | null> {
+    return await collection.findOne<Post>({ slug: slug, }, { projection: { _id: 0, } });
 }
 
 export async function getPostSummaries(): Promise<PostSummary[]> {
-    return posts as PostSummary[];
+    return await collection.find<PostSummary>({}, { projection: { _id: 0, } }).sort({ date: -1 }).toArray();
 }
