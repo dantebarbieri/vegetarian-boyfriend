@@ -118,6 +118,11 @@
 		padding: 0.1em 0;
 	}
 
+	nav a:not([aria-current='page']):hover {
+		border-bottom: 1px solid var(--primary);
+		transition: border-bottom 0.2s ease-in-out;
+	}
+
 	a[aria-current='page'] {
 		border-bottom: 1px solid currentColor;
 	}

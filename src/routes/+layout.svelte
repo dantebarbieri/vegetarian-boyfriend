@@ -1,7 +1,9 @@
 <script lang="ts">
+	import '@fontsource/poppins';
 	import { onMount } from 'svelte';
 	import Header from './Header.svelte';
-	import '@fontsource/poppins';
+	import Footer from './Footer.svelte';
+	import 'normalize.css';
 
 	onMount(() => {
 		const setTheme = () => {
@@ -26,15 +28,18 @@
 </script>
 
 <Header />
-<slot />
+<main>
+	<slot />
+</main>
+<Footer />
 
 <style>
 	:global(:root) {
 		--text: #211a12;
 		--background: #f0ebe5;
-		--primary: #273445;
-		--secondary: #cecee3;
-		--accent: #2b338c;
+		--primary: #8f9a7a;
+		--secondary: #b37c35;
+		--accent: #325560;
 	}
 
 	:global(:root.dark) {
@@ -42,7 +47,7 @@
 		--background: #211a12;
 		--primary: #84b0e9;
 		--secondary: #b2b2e1;
-		--accent: #31317b;
+		--accent: #7e7e9a;
 	}
 
 	:global(:root) {
@@ -55,9 +60,22 @@
 
 	:global(body) {
 		margin: 0;
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
 	}
 
 	:global(*, *:before, *:after) {
 		box-sizing: inherit;
+	}
+
+	main {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		margin: 0 auto;
+		padding-left: 6vw;
+		padding-right: 6vw;
 	}
 </style>

@@ -23,6 +23,11 @@
 		display: inline-flex;
 		margin: 0;
 		padding: 0;
+		transition: scale 0.2s ease-in-out;
+	}
+
+	a:hover {
+		scale: 1.1;
 	}
 
 	svg {
