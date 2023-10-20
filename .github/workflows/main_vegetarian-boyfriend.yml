@@ -48,7 +48,7 @@ jobs:
         npm run build --if-present
         npm run test --if-present
       env:
-        COSMOS_CONNECTION_STRING: ${{ secrets.COSMOS_CONNECTION_STRING }}
+        AZURE_COSMOS_CONNECTIONSTRING: ${{ secrets.AZURE_COSMOS_CONNECTIONSTRING }}
 
 
     - name: Upload artifact for deployment job
