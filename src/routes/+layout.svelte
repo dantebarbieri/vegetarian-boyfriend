@@ -56,6 +56,7 @@
 		font-family: Poppins, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
 			Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 		box-sizing: border-box;
+		-webkit-font-smoothing: antialiased;
 	}
 
 	:global(body) {

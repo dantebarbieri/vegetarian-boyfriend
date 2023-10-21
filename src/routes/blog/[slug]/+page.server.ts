@@ -1,2 +1,2 @@
 import * as db from '$lib/server/database'; import type { PageServerLoad } from './$types';
-export const load: PageServerLoad = async ({ params }) => { return { post: await db.getPost(params.slug), }; };
+export const load: PageServerLoad = async ({ params }) => { return { previous: await db.getPreviousPostSlugAndTitle(params.slug), post: await db.getPost(params.slug), next: await db.getNextPostSlugAndTitle(params.slug) }; };
