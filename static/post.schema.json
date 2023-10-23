@@ -5,7 +5,14 @@
     "description": "A blog post on thevegetarianboyfriend.com",
     "type": "object",
     "properties": {
+        "$schema": {
+            "type": "string",
+            "format": "uri"
+        },
         "slug": {
+            "type": "string"
+        },
+        "category": {
             "type": "string"
         },
         "title": {
@@ -51,6 +58,7 @@
     },
     "required": [
         "slug",
+        "category",
         "title",
         "date",
         "content",
