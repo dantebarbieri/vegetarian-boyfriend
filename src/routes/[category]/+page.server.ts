@@ -1,0 +1,2 @@
+import * as db from '$lib/server/database'; import type { PageServerLoad } from '../[category]/$types';
+export const load: PageServerLoad = async ({ params }) => { return { posts: await db.getPostSummariesByCategory(params.category), }; };

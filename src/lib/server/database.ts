@@ -39,6 +39,7 @@ interface Post {
 
 interface PostSummary {
     slug: string;
+    category: string;
     title: string;
     date: Date;
     description: string;
@@ -46,15 +47,15 @@ interface PostSummary {
     imageSrcWebp?: string;
 }
 
-export async function getPostFromDb(slug: string): Promise<Post | null> {
+async function getPostFromDb(slug: string): Promise<Post | null> {
     return await collection!.findOne<Post>({ slug: slug, }, { projection: { _id: 0, } });
 }
 
-export async function getPostSummariesFromDb(): Promise<PostSummary[]> {
+async function getPostSummariesFromDb(): Promise<PostSummary[]> {
     return await collection!.find<PostSummary>({}, { projection: { _id: 0, } }).sort({ date: -1 }).toArray();
 }
 
-export async function getPostFromLocal(slug: string): Promise<Post | null> {
+async function getPostFromLocal(slug: string): Promise<Post | null> {
     try {
         const filePath = path.join(LOCAL_POSTS_DIR, `${slug}.json`);
         const fileContents = await fs.readFile(filePath, "utf-8");
@@ -71,7 +72,7 @@ export async function getPostFromLocal(slug: string): Promise<Post | null> {
     }
 }
 
-export async function getPostSummariesFromLocal(): Promise<PostSummary[]> {
+async function getPostSummariesFromLocal(): Promise<PostSummary[]> {
     try {
         const fileNames = await fs.readdir(LOCAL_POSTS_DIR);
         const postSummaries: PostSummary[] = [];
@@ -103,6 +104,11 @@ export async function getPostSummariesFromLocal(): Promise<PostSummary[]> {
     }
 }
 
+async function getPostSummariesFromLocalWithCategory(category: string): Promise<PostSummary[]> {
+    const postSummaries = await getPostSummariesFromLocal();
+    return postSummaries.filter(post => post.category === category);
+}
+
 export async function getPreviousPostSlugAndTitle(slug: string): Promise<PostSlugAndTitle | null> {
     if (collection) {
         const currentPost = await getPostFromDb(slug);
@@ -110,7 +116,7 @@ export async function getPreviousPostSlugAndTitle(slug: string): Promise<PostSlu
 
         const previousPost = await collection!.findOne<PostSlugAndTitle>(
             { date: { $lt: currentPost.date } },
-            { projection: { slug: 1, title: 1 }, sort: { date: -1 }, limit: 1 }
+            { projection: { slug: 1, title: 1, _id: 0 }, sort: { date: -1 }, limit: 1 }
         );
         return previousPost;
     }
@@ -134,12 +140,60 @@ export async function getNextPostSlugAndTitle(slug: string): Promise<PostSlugAnd
 
         const nextPost = await collection!.findOne<PostSlugAndTitle>(
             { date: { $gt: currentPost.date } },
-            { projection: { slug: 1, title: 1 }, sort: { date: 1 }, limit: 1 }
+            { projection: { slug: 1, title: 1, _id: 0 }, sort: { date: 1 }, limit: 1 }
         );
         return nextPost;
     }
     else {
         const postSummaries = await getPostSummariesFromLocal();
+        const index = postSummaries.findIndex(p => p.slug === slug);
+
+        if (index === -1 || index === postSummaries.length - 1) return null;
+
+        return {
+            slug: postSummaries[index + 1].slug,
+            title: postSummaries[index + 1].title
+        };
+    }
+}
+
+export async function getPreviousPostSlugAndTitleWithinCategory(slug: string, category: string): Promise<PostSlugAndTitle | null> {
+    if (collection) {
+        const currentPost = await getPostFromDb(slug);
+        if (!currentPost) return null;
+
+        const previousPost = await collection!.findOne<PostSlugAndTitle>(
+            { category: category, date: { $lt: currentPost.date } },
+            { projection: { slug: 1, title: 1, _id: 0 }, sort: { date: -1 }, limit: 1 }
+        );
+        return previousPost;
+    }
+    else {
+        const postSummaries = await getPostSummariesFromLocalWithCategory(category);
+        const index = postSummaries.findIndex(p => p.slug === slug);
+
+        if (index === -1 || index === 0) return null;
+
+        return {
+            slug: postSummaries[index - 1].slug,
+            title: postSummaries[index - 1].title
+        };
+    }
+}
+
+export async function getNextPostSlugAndTitleWithinCategory(slug: string, category: string): Promise<PostSlugAndTitle | null> {
+    if (collection) {
+        const currentPost = await getPostFromDb(slug);
+        if (!currentPost) return null;
+
+        const nextPost = await collection!.findOne<PostSlugAndTitle>(
+            { category: category, date: { $gt: currentPost.date } },
+            { projection: { slug: 1, title: 1, _id: 0 }, sort: { date: 1 }, limit: 1 }
+        );
+        return nextPost;
+    }
+    else {
+        const postSummaries = await getPostSummariesFromLocalWithCategory(category);
         const index = postSummaries.findIndex(p => p.slug === slug);
 
         if (index === -1 || index === postSummaries.length - 1) return null;
@@ -168,3 +222,23 @@ export async function getPostSummaries(): Promise<PostSummary[]> {
         return getPostSummariesFromLocal()
     }
 }
+
+export async function getCategories(): Promise<string[]> {
+    if (collection) {
+        return await collection.distinct("category");
+    } else {
+        // For local posts, read from each post and gather the categories
+        const postSummaries = await getPostSummariesFromLocal();
+        const categoriesSet = new Set(postSummaries.map(post => post.category));
+        return Array.from(categoriesSet);
+    }
+}
+
+export async function getPostSummariesByCategory(category: string): Promise<PostSummary[]> {
+    if (collection) {
+        return await collection.find<PostSummary>({ category: category }, { projection: { _id: 0 } }).sort({ date: -1 }).toArray();
+    } else {
+        return await getPostSummariesFromLocalWithCategory(category);
+    }
+}
+
