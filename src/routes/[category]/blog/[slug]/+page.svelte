@@ -92,26 +92,31 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		gap: 1rem;
 	}
 
 	header {
 		width: 100%;
 		display: flex;
 		flex-direction: column;
-		margin-bottom: 15px;
 	}
 
 	.blog-image {
 		width: 90%;
 		display: flex;
-		justify-content: center;
-		align-items: center;
+		overflow: hidden;
+		position: relative;
+		aspect-ratio: 6185 / 4650;
 	}
 
 	img {
-		aspect-ratio: auto 2448 / 2476;
 		width: 100%;
+		height: 100%;
 		object-fit: cover;
+		position: absolute;
+		top: 0;
+		left: 0;
+		image-rendering: auto;
 	}
 
 	h2 {
@@ -131,6 +136,7 @@
 	}
 
 	.content {
+		width: 100%;
 		margin-bottom: 3vw;
 		padding-left: 1rem;
 		padding-right: 1rem;

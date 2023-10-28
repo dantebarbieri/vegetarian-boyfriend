@@ -43,13 +43,18 @@
 		display: inline-flex;
 		flex-basis: 55%;
 		overflow: hidden;
+		position: relative;
+		aspect-ratio: 6185 / 4650;
 	}
 
 	img {
-		aspect-ratio: auto 2448 / 2476;
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+		position: absolute;
+		top: 0;
+		left: 0;
+		image-rendering: auto;
 	}
 
 	.blog-summary {

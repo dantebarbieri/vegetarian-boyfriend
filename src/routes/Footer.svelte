@@ -55,6 +55,7 @@
 	input {
 		border: 1px solid #0000001f;
 		background-color: var(--background);
+		color: var(--text);
 		font-family: Poppins, inherit;
 		font-weight: 300;
 		min-width: 18rem;
