@@ -24,9 +24,14 @@
 
 <style>
 	.cards {
-		/* padding: 1rem; remove me */
 		display: flex;
 		flex-direction: column;
 		gap: 6rem;
+	}
+
+	@media (max-width: 768px) {
+		.cards {
+			gap: 100px;
+		}
 	}
 </style>
