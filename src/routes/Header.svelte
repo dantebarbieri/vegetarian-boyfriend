@@ -51,7 +51,9 @@
 <header>
 	<div class="inner-container">
 		<div class="nav">
-			<a id="title" href="/"><h1>The Vegetarian Boyfriend</h1></a>
+			<a id="title" href="/">
+				<h1><span class="responsive-hide">The </span>Vegetarian Boyfriend</h1>
+			</a>
 			<nav>
 				<ul>
 					<li><a href="/" use:setActiveLink>Blog</a></li>
@@ -130,6 +132,7 @@
 	@media only screen and (pointer: coarse) and (max-width: 1024px), screen and (max-width: 800px) {
 		header {
 			padding: 6vw;
+			margin-bottom: 1.25rem;
 		}
 	}
 
@@ -172,6 +175,12 @@
 		margin: 0;
 	}
 
+	@media screen and (max-width: 399px) {
+		.responsive-hide {
+			display: none;
+		}
+	}
+
 	a {
 		color: var(--text);
 		text-decoration: none;
@@ -180,12 +189,12 @@
 		padding: 0.1em 0;
 	}
 
-	.nav nav a:not([aria-current='page']):hover {
+	nav a:not([aria-current='page']):hover {
 		border-bottom: 1px solid var(--primary);
 		transition: border-bottom 0.2s ease-in-out;
 	}
 
-	.nav a[aria-current='page'] {
+	a[aria-current='page'] {
 		border-bottom: 1px solid currentColor;
 	}
 

@@ -36,6 +36,7 @@
 <style>
 	.blog-card {
 		display: flex;
+		flex-direction: row;
 		gap: 4rem;
 	}
 
@@ -45,6 +46,19 @@
 		overflow: hidden;
 		position: relative;
 		aspect-ratio: 6185 / 4650;
+	}
+
+	@media (max-width: 768px) {
+		.blog-card {
+			flex-direction: column;
+			gap: 5vw;
+		}
+
+		.blog-image {
+			display: flex;
+			aspect-ratio: 672 / 505;
+			width: 100%;
+		}
 	}
 
 	img {
@@ -76,6 +90,12 @@
 		line-height: 1.4;
 	}
 
+	@media screen and (max-width: 767px) and (orientation: portrait) {
+		h2 {
+			font-size: 2rem;
+		}
+	}
+
 	.description {
 		line-height: 1.8;
 		white-space: pre-wrap;
@@ -92,6 +112,7 @@
 
 	a {
 		color: var(--text);
+		text-underline-offset: 3px;
 	}
 
 	.blog-title {
