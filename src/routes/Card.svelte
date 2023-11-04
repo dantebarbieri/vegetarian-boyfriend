@@ -81,6 +81,12 @@
 		font-weight: 300;
 	}
 
+	@media screen and (orientation: portrait) {
+		.blog-summary {
+			gap: 2vw;
+		}
+	}
+
 	h2 {
 		font-family: 'Josefin Sans Variable', sans-serif;
 		font-weight: 500;

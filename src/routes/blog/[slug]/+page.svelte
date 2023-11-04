@@ -167,6 +167,14 @@
 		max-width: 50%;
 	}
 
+	#pagination a:first-child {
+		text-align: left;
+	}
+
+	#pagination a:last-child {
+		text-align: right;
+	}
+
 	.hidden {
 		visibility: hidden;
 		pointer-events: none;
@@ -193,5 +201,30 @@
 
 	a:last-child svg {
 		padding-left: 1.5em;
+	}
+
+	@media screen and (max-width: 767px) and (orientation: portrait) {
+		h2 {
+			font-size: 2.5rem;
+		}
+
+		h3 {
+			font-size: 1.6rem;
+		}
+	}
+
+	@media screen and (max-width: 767px) {
+		.inner-wrapper {
+			flex-basis: 100%;
+		}
+
+		.blog-image {
+			width: 100%;
+		}
+
+		.content {
+			padding-left: 0;
+			padding-right: 0;
+		}
 	}
 </style>
