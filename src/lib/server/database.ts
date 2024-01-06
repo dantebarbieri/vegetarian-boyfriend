@@ -1,9 +1,13 @@
 // Use official mongodb driver to connect to the server
+import DOMPurify from 'dompurify';
+import { marked } from 'marked';
 import { Collection, MongoClient } from 'mongodb';
 
 let collection: Collection<Document> | undefined = undefined;
 
 if (process.env.AZURE_COSMOS_CONNECTIONSTRING) {
+    console.log("Connecting to Cosmos DB...");
+
     // New instance of MongoClient with connection string
     // for Cosmos DB
     const client = new MongoClient(process.env.AZURE_COSMOS_CONNECTIONSTRING);
@@ -16,6 +20,8 @@ if (process.env.AZURE_COSMOS_CONNECTIONSTRING) {
 
     // Collection reference with creation if it does not already exist
     collection = db.collection('posts');
+} else {
+    console.log("No Cosmos DB connection string found, using local posts...");
 }
 
 import { promises as fs } from "fs";
@@ -23,7 +29,7 @@ import path from "path";
 
 const LOCAL_POSTS_DIR = path.resolve("src", "lib", "posts");
 
-interface PostSlugAndTitle {
+export interface PostSlugAndTitle {
     slug: string;
     title: string;
 }
@@ -32,7 +38,7 @@ interface Post {
     slug: string;
     title: string;
     date: Date;
-    content: string | string[];
+    content: string;
     imageSrcFallback: string;
     imageSrcWebp?: string;
 }
@@ -48,11 +54,24 @@ interface PostSummary {
 }
 
 async function getPostFromDb(slug: string): Promise<Post | null> {
-    return await collection!.findOne<Post>({ slug: slug, }, { projection: { _id: 0, } });
+    const post = await collection!.findOne<Post>({ slug: slug, }, { projection: { _id: 0, } });
+    if (post !== null) {
+        post.content = DOMPurify.sanitize(
+            marked.parseInline(post.content.replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/, '')) as string
+        )
+    }
+    return post;
 }
 
 async function getPostSummariesFromDb(): Promise<PostSummary[]> {
-    return await collection!.find<PostSummary>({}, { projection: { _id: 0, } }).sort({ date: -1 }).toArray();
+    const postSummaries = await collection!.find<PostSummary>({}, { projection: { _id: 0, } }).sort({ date: -1 }).toArray();
+
+    return postSummaries.map(summary => {
+        summary.description = DOMPurify.sanitize(
+            marked.parseInline(summary.description.replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/, '')) as string
+        )
+        return summary;
+    });
 }
 
 async function getPostFromLocal(slug: string): Promise<Post | null> {
@@ -62,6 +81,11 @@ async function getPostFromLocal(slug: string): Promise<Post | null> {
         const post: Post = JSON.parse(fileContents, (_key, value) => {
             if (value && typeof value === 'object' && value.hasOwnProperty("$date")) {
                 return new Date(value["$date"]);
+            }
+            if (typeof value === 'string' && (_key === "content" || _key === "description")) {
+                return DOMPurify.sanitize(
+                    marked.parseInline(value.replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/, '')) as string
+                )
             }
             return value;
         });
@@ -90,6 +114,11 @@ async function getPostSummariesFromLocal(): Promise<PostSummary[]> {
             const postSummary: PostSummary = JSON.parse(fileContents, (_key, value) => {
                 if (value && typeof value === 'object' && value.hasOwnProperty("$date")) {
                     return new Date(value["$date"]);
+                }
+                if (typeof value === 'string' && (_key === "content" || _key === "description")) {
+                    return DOMPurify.sanitize(
+                        marked.parseInline(value.replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/, '')) as string
+                    )
                 }
                 return value;
             });
